@@ -1,0 +1,172 @@
+{
+  "users": [
+    {
+      "id": "USR-98EB2BCF",
+      "role": "admin",
+      "fullName": "Sofia Ramirez",
+      "email": "admin@vethelp.cloud",
+      "passwordHash": "ad421d0ae529f5f1d42eaf79b5343c974480dce4827a6c398c014b2a1e511fc35af9f84e782d5ecddff86eb1e8886f679fec8326c105c3502465d62745bd3a36",
+      "passwordSalt": "17ceab7dffab032ed51311501e3fe129",
+      "createdAt": "2026-05-28T02:26:37.636Z"
+    },
+    {
+      "id": "USR-9EFF98E4",
+      "role": "owner",
+      "fullName": "Maria Vega",
+      "dni": "44556677",
+      "email": "maria@demo.com",
+      "passwordSalt": "3bf203834c3035cd7cd2a350ae7cfd0b",
+      "passwordHash": "9da7724ab6febb79fbc9d2c8e102fad009e87c3ca60436832f705a55796e83775a5468279476d8cff60905801eef3a8cd33bd791a22b37d728cfafded60d54b2",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "USR-9D2F85EA",
+      "role": "family",
+      "fullName": "Leo Vega",
+      "dni": "77889911",
+      "ownerDni": "44556677",
+      "email": "leo@demo.com",
+      "passwordSalt": "5743b3ab7b46b88fc479fe82d4788462",
+      "passwordHash": "9158ee9fe499a95b92940db76f57ec2508c2a8df35a8d1697132c0ec211c8cfe4fa73aa5e4589b42530c509808fb10bf36f5ff8f0ccb59f4041089b8f261e1a2",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "USR-F0AB37AE",
+      "role": "vet",
+      "clinicName": "Clinica Animal Sur",
+      "ruc": "20123456789",
+      "email": "vet@demo.com",
+      "passwordSalt": "dec512bea9cd708c0584c2f98c20c306",
+      "passwordHash": "78ffb30edc7fd381e3fb67cd243bb84b88b575464545bd9ffd06ea368a5bd4a5e37590b834ad93adc10151f368d312ac83a91c16337318c84414d26f966491b1",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "USR-5FBDAD8A",
+      "role": "airline",
+      "airlineCode": "AERO001",
+      "email": "vuelos@airpet.com",
+      "passwordSalt": "6f289d5dea04af18b5404555bb40cee8",
+      "passwordHash": "7a4534614e20e1ebb0ebe4a98d9a5363a3e13fda1018e6a2336892f6533d8837d31acf9e6ccd4ae9dfb7ec844f61c368d2e375bf8c9fa9aff480be624c195b02",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    }
+  ],
+  "pets": [
+    {
+      "petId": "PET-2026-0001",
+      "name": "Luna",
+      "species": "perro",
+      "sex": "hembra",
+      "birthDate": "2021-02-12",
+      "traits": "pelaje corto, orejas largas",
+      "ownerComment": "es tranquila y sociable",
+      "estimatedBreed": "Cocker Spaniel (estimacion IA)",
+      "ownerDni": "44556677",
+      "allergies": [
+        "pollo"
+      ],
+      "vaccines": [
+        "rabia",
+        "parvovirus",
+        "moquillo"
+      ],
+      "familyDnis": [
+        "77889911"
+      ],
+      "authorizedVetRucs": [
+        "20123456789"
+      ],
+      "createdAt": "2026-04-24T03:02:20.346Z",
+      "updatedAt": "2026-05-28T05:14:09.056Z",
+      "avatarConfig": {
+        "furColor": "#212121",
+        "innerColor": "#FFFFFF",
+        "accessoryColor": "#FFFFFF",
+        "eyeColor": "#000000",
+        "pattern": "stripe",
+        "accessory": "collar"
+      }
+    }
+  ],
+  "records": [
+    {
+      "id": "REC-451F72DB",
+      "petId": "PET-2026-0001",
+      "type": "consulta",
+      "description": "Chequeo general. Estado estable.",
+      "vaccinesAdded": [],
+      "allergiesAdded": [],
+      "attachments": [
+        "informe-chequeo.pdf"
+      ],
+      "actorRole": "vet",
+      "actorName": "Clinica Animal Sur",
+      "actorId": "20123456789",
+      "clinicName": "Clinica Animal Sur",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    }
+  ],
+  "clinics": [
+    {
+      "id": "CLN-01",
+      "name": "Clinica Animal Sur",
+      "district": "Surco",
+      "rating": 4.9,
+      "speciality": "Vacunas y medicina preventiva",
+      "reviews": 312
+    },
+    {
+      "id": "CLN-02",
+      "name": "Vet Plaza Central",
+      "district": "Miraflores",
+      "rating": 4.7,
+      "speciality": "Dermatologia y alergias",
+      "reviews": 201
+    },
+    {
+      "id": "CLN-03",
+      "name": "Paws 24h",
+      "district": "San Isidro",
+      "rating": 4.8,
+      "speciality": "Emergencias y hospitalizacion",
+      "reviews": 456
+    },
+    {
+      "id": "CLN-04",
+      "name": "Centro Vet Norte",
+      "district": "Los Olivos",
+      "rating": 4.6,
+      "speciality": "Cirugia y rehabilitacion",
+      "reviews": 174
+    },
+    {
+      "id": "CLN-05",
+      "name": "PetCare Lima Este",
+      "district": "Ate",
+      "rating": 4.5,
+      "speciality": "Nutricion y control senior",
+      "reviews": 98
+    }
+  ],
+  "audit": [
+    {
+      "id": "AUD-3FB3C3F4",
+      "petId": "PET-2026-0001",
+      "action": "pet-created",
+      "actorRole": "owner",
+      "actorName": "Maria Vega",
+      "actorId": "44556677",
+      "details": "Ficha inicial registrada",
+      "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "AUD-1CF62A6F",
+      "petId": "PET-2026-0001",
+      "action": "pet-updated",
+      "actorRole": "owner",
+      "actorName": "Maria Vega",
+      "actorId": "44556677",
+      "details": "Dueno actualizo datos base",
+      "createdAt": "2026-05-28T05:14:09.056Z"
+    }
+  ]
+}
