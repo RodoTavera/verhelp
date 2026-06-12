@@ -1,30 +1,30 @@
-import { useDeferredValue, useEffect, useState } from 'react'
+﻿import { useDeferredValue, useEffect, useRef, useState } from 'react'
 import { api } from '../utils/api'
+import { useGSAP } from '../lib/gsap'
+import { attachHoverLift, scrollReveal } from '../lib/motion'
 
 export default function Clinics() {
   const [clinics, setClinics] = useState([])
   const [filtered, setFiltered] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const deferredSearch = useDeferredValue(search)
+  const rootRef = useRef(null)
 
-  useEffect(() => {
-    fetchClinics()
-  }, [])
+  useEffect(() => { void fetchClinics() }, [])
 
   useEffect(() => {
     const value = deferredSearch.trim().toLowerCase()
-
     if (!value) {
       setFiltered(clinics)
       return
     }
-
     setFiltered(
       clinics.filter((clinic) =>
         clinic.name?.toLowerCase().includes(value) ||
-        clinic.zone?.toLowerCase().includes(value) ||
-        clinic.specialty?.toLowerCase().includes(value)
+        clinic.district?.toLowerCase().includes(value) ||
+        clinic.speciality?.toLowerCase().includes(value)
       )
     )
   }, [deferredSearch, clinics])
@@ -32,141 +32,89 @@ export default function Clinics() {
   const fetchClinics = async () => {
     try {
       const res = await api.get('/api/clinics')
-      setClinics(res.data)
-      setFiltered(res.data)
+      setClinics(res.data || [])
+      setFiltered(res.data || [])
     } catch (err) {
-      console.error('Error:', err)
+      console.error('Error cargando clinicas:', err)
+      setError(err.response?.data?.message || err.message || 'No se pudieron cargar las clinicas.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value)
-  }
+  useGSAP(
+    () => {
+      if (!rootRef.current) return undefined
+      scrollReveal(rootRef.current, '[data-rise]')
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      return () => cleanHover()
+    },
+    { scope: rootRef, dependencies: [] }
+  )
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-600">Cargando veterinarias...</p>
-        </div>
+      <div className="flex items-center justify-center py-24">
+        <div className="h-12 w-12 animate-spin rounded-full border-2 border-brand border-t-transparent" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-8 animate-fade">
-      <section className="hero-panel animate-in">
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div className="space-y-4">
-            <span className="section-kicker">Red veterinaria</span>
-            <h1 className="text-5xl font-black text-dark">Clinicas autorizadas con lectura rapida y filtros utiles.</h1>
-            <p className="max-w-2xl text-lg text-dark/70">Encuentra clinicas por zona o especialidad en una vista mas clara, mas profesional y mas facil de consultar.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { value: clinics.length, label: 'clinicas activas' },
-              { value: filtered.length, label: 'resultados visibles' },
-              { value: '24/7', label: 'consulta rapida' },
-            ].map((item) => (
-              <div key={item.label} className="metric-pill">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark/45">{item.label}</p>
-                <p className="mt-3 text-3xl font-black text-dark">{item.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="space-y-10" ref={rootRef}>
+      <section className="animalist-card" data-rise>
+        <p className="eyebrow-label">Red veterinaria</p>
+        <h1 className="mt-3 text-4xl text-dark md:text-5xl">Clinicas que acompanan</h1>
+        <p className="mt-3 max-w-xl text-sm text-dark/68">
+          Encuentra clinicas por zona o especialidad. Una red pensada para acompanar, no para abrumar.
+        </p>
       </section>
 
-      <div className="card p-6 animate-in space-y-4">
+      <div className="animalist-card space-y-3" data-rise>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent">Busqueda inteligente</p>
-            <p className="text-dark/65">Filtra por nombre, distrito o especialidad.</p>
-          </div>
-          <span className="tag">{filtered.length} clínicas</span>
+          <p className="eyebrow-label">Busqueda</p>
+          <span className="pet-species-pill">{filtered.length} resultados</span>
         </div>
         <input
           type="text"
-          placeholder="Busca por nombre, zona o especialidad..."
+          placeholder="Busca por nombre, zona o especialidad"
           value={search}
-          onChange={handleSearch}
+          onChange={(e) => setSearch(e.target.value)}
           className="input-field"
         />
       </div>
 
-      <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="card animate-in">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-brand">Cobertura</p>
-          <h2 className="mt-2 text-3xl font-black text-dark">Mapa de ubicacion en siguiente iteracion.</h2>
-          <p className="mt-3 max-w-2xl text-dark/68">Por ahora el directorio prioriza claridad operativa: nombre, zona, especialidad, telefono y reputacion visibles sin depender del mapa.</p>
-        </article>
-        <article className="card-soft animate-in" style={{ animationDelay: '0.06s' }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-accent">Que puedes hacer aqui</p>
-          <div className="mt-4 grid gap-3">
-            {['Buscar por distrito', 'Revisar especialidades', 'Detectar clinicas mejor valoradas'].map((item, index) => (
-              <div key={item} className="rounded-lg border border-dark/8 bg-white/75 px-4 py-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-dark/45">0{index + 1}</p>
-                <p className="mt-2 text-sm text-dark/70">{item}</p>
+      {error && (
+        <div className="rounded-2xl border border-red-200/70 bg-red-50 px-4 py-3 text-sm text-red-700" data-rise>
+          {error}
+        </div>
+      )}
+
+      {!error && filtered.length === 0 ? (
+        <div className="animalist-card text-center" data-rise>
+          <p className="editorial-quote text-2xl text-dark">No encontramos clinicas con ese criterio. Prueba con otra palabra.</p>
+        </div>
+      ) : (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((clinic) => (
+            <article key={clinic.id} className="animalist-card flex flex-col gap-4" data-hover data-rise>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="eyebrow-label">Clinica autorizada</p>
+                  <h2 className="mt-2 text-2xl text-dark">{clinic.name}</h2>
+                </div>
+                <span className="pet-species-pill">{clinic.rating} ★</span>
               </div>
-            ))}
-          </div>
-        </article>
-      </section>
-
-      <div>
-        {filtered.length === 0 ? (
-          <div className="card p-12 text-center">
-            <p className="text-gray-600">No se encontraron veterinarias</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {filtered.map((clinic, idx) => (
-              <article key={clinic.id} className="card p-6 hover:shadow-2xl hover:shadow-dark/10 transition-shadow animate-in" style={{ animationDelay: `${idx * 0.06}s` }}>
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark/45">Clinica autorizada</p>
-                    <h3 className="text-2xl font-black text-dark">{clinic.name}</h3>
-                  </div>
-                  <span className="tag">{clinic.rating}</span>
-                </div>
-
-                <div className="space-y-3 text-sm mb-4">
-                  <p>
-                    <span className="font-semibold text-gray-600">Zona:</span>
-                    <br />
-                    {clinic.zone}
-                  </p>
-                  {clinic.specialty && (
-                    <p>
-                      <span className="font-semibold text-gray-600">Especialidad:</span>
-                      <br />
-                      {clinic.specialty}
-                    </p>
-                  )}
-                  {clinic.phone && (
-                    <p>
-                      <span className="font-semibold text-gray-600">Teléfono:</span>
-                      <br />
-                      {clinic.phone}
-                    </p>
-                  )}
-                </div>
-
-                <div className="rounded-lg bg-gradient-soft px-4 py-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-dark/45">Confianza</p>
-                    <p className="text-lg font-bold text-brand">{clinic.reviews || 0} reseñas</p>
-                  </div>
-                  <span className="tag">{clinic.specialty || 'General'}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
+              <ul className="subtle-list text-sm">
+                <li><span>Distrito: {clinic.district}</span></li>
+                {clinic.speciality && <li><span>Especialidad: {clinic.speciality}</span></li>}
+                {clinic.phone && <li><span>Telefono: {clinic.phone}</span></li>}
+                <li><span>Confianza: {clinic.reviews || 0} resenas</span></li>
+              </ul>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

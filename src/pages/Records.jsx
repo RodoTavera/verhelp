@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '../utils/api'
 import { formatDateTime } from '../utils/helpers'
 import { useAuth } from '../context/AuthContext'
+import { useGSAP } from '../lib/gsap'
+import { attachHoverLift, attachMagnetic, scrollReveal } from '../lib/motion'
 
-const INITIAL_FORM = {
-  type: 'consulta',
-  description: '',
-  vaccines: '',
-  allergies: '',
-}
+const INITIAL_FORM = { type: 'consulta', description: '', vaccines: '', allergies: '' }
+
+const TYPES = [
+  { value: 'consulta', label: 'Consulta' },
+  { value: 'vacuna', label: 'Vacuna' },
+  { value: 'alergia', label: 'Alergia' },
+  { value: 'tratamiento', label: 'Tratamiento' },
+  { value: 'nota', label: 'Nota' },
+]
 
 export default function Records() {
   const { user } = useAuth()
@@ -27,9 +32,7 @@ export default function Records() {
   }, [])
 
   useEffect(() => {
-    if (selectedPetId) {
-      void fetchRecords(selectedPetId)
-    }
+    if (selectedPetId) void fetchRecords(selectedPetId)
   }, [selectedPetId])
 
   const canCreateRecord = user?.role === 'owner' || user?.role === 'vet'
@@ -38,9 +41,7 @@ export default function Records() {
     try {
       const res = await api.get('/api/pets')
       setPets(res.data)
-      if (res.data.length > 0) {
-        setSelectedPetId(res.data[0].id)
-      }
+      if (res.data.length > 0) setSelectedPetId(res.data[0].id)
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'No se pudieron cargar las mascotas')
     } finally {
@@ -62,13 +63,12 @@ export default function Records() {
     e.preventDefault()
     setSubmitting(true)
     setError('')
-
     try {
       await api.post(`/api/pets/${selectedPetId}/records`, {
         type: formData.type,
         description: formData.description,
-        vaccines: formData.vaccines ? formData.vaccines.split(',').map((item) => item.trim()).filter(Boolean) : [],
-        allergies: formData.allergies ? formData.allergies.split(',').map((item) => item.trim()).filter(Boolean) : [],
+        vaccines: formData.vaccines ? formData.vaccines.split(',').map((i) => i.trim()).filter(Boolean) : [],
+        allergies: formData.allergies ? formData.allergies.split(',').map((i) => i.trim()).filter(Boolean) : [],
       })
       setFormData(INITIAL_FORM)
       setShowForm(false)
@@ -82,11 +82,8 @@ export default function Records() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-600">Cargando historial...</p>
-        </div>
+      <div className="flex items-center justify-center py-24">
+        <div className="h-12 w-12 animate-spin rounded-full border-2 border-brand border-t-transparent" />
       </div>
     )
   }
@@ -110,153 +107,125 @@ export default function Records() {
       description: entry.details,
       createdAt: entry.createdAt,
       actorName: entry.actorName,
-      vaccines: [],
-      allergies: [],
     })),
   ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
+  const rootRef = useRef(null)
+  useGSAP(
+    () => {
+      scrollReveal(rootRef.current, '[data-rise]')
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
+      return () => {
+        cleanHover()
+        cleanMagnetic()
+      }
+    },
+    { scope: rootRef, dependencies: [timeline, selectedPetId] }
+  )
+
   return (
-    <div className="space-y-8 animate-fade">
-      <section className="hero-panel animate-in">
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
-          <div className="space-y-4">
-            <span className="section-kicker">Historial y auditoria</span>
-            <h1 className="text-5xl font-black text-dark">Registros clinicos con trazabilidad por mascota.</h1>
-            <p className="max-w-2xl text-lg text-dark/70">Consulta actividad clinica y auditoria en un formato mas limpio, mas legible y mas util para seguimiento.</p>
-            {canCreateRecord && (
-              <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-                {showForm ? 'Cancelar' : 'Nuevo registro'}
-              </button>
-            )}
+    <div className="space-y-10" ref={rootRef}>
+      <section className="animalist-card" data-rise>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow-label">Historial clinico</p>
+            <h1 className="mt-3 text-4xl text-dark">La historia de cada cuidado</h1>
+            <p className="mt-3 max-w-xl text-sm text-dark/68">
+              Revisa registros y movimientos. La informacion se lee rapido y se entiende mejor.
+            </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { value: records.length, label: 'registros' },
-              { value: audit.length, label: 'auditoria' },
-              { value: selectedPet ? selectedPet.name : '-', label: 'mascota activa' },
-            ].map((item) => (
-              <div key={item.label} className="metric-pill">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-dark/45">{item.label}</p>
-                <p className="mt-3 text-3xl font-black text-dark break-words">{item.value}</p>
-              </div>
-            ))}
-          </div>
+          {canCreateRecord && (
+            <button onClick={() => setShowForm(!showForm)} className="btn-primary text-sm" data-magnetic>
+              {showForm ? 'Cancelar' : 'Nuevo registro'}
+            </button>
+          )}
         </div>
       </section>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+        <div className="rounded-2xl border border-red-200/70 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      <div className="card p-6">
-        <label className="block text-sm font-semibold mb-3">Selecciona una mascota</label>
-        <select value={selectedPetId} onChange={(e) => setSelectedPetId(e.target.value)} className="input-field">
+      <label className="block">
+        <span className="eyebrow-label">Mascota</span>
+        <select value={selectedPetId} onChange={(e) => setSelectedPetId(e.target.value)} className="input-field mt-2">
           {pets.map((pet) => (
-            <option key={pet.id} value={pet.id}>
-              {pet.name} ({pet.species})
-            </option>
+            <option key={pet.id} value={pet.id}>{pet.name} ({pet.species})</option>
           ))}
         </select>
-      </div>
+      </label>
 
       {showForm && selectedPet && canCreateRecord && (
-        <div className="card p-6 space-y-4 animate-in">
-          <h2 className="text-2xl font-bold mb-4">Nuevo registro para {selectedPet.name}</h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="animalist-card space-y-5" data-rise>
+          <h2 className="text-2xl text-dark">Nuevo registro para {selectedPet.name}</h2>
+          <div className="grid gap-4 md:grid-cols-2">
             <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="input-field">
-              <option value="consulta">Consulta</option>
-              <option value="vacuna">Vacuna</option>
-              <option value="alergia">Alergia</option>
-              <option value="tratamiento">Tratamiento</option>
-              <option value="nota">Nota</option>
+              {TYPES.map((type) => (
+                <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
             </select>
-
+            <input type="text" placeholder="Vacunas" value={formData.vaccines} onChange={(e) => setFormData({ ...formData, vaccines: e.target.value })} className="input-field" />
+            <input type="text" placeholder="Alergias" value={formData.allergies} onChange={(e) => setFormData({ ...formData, allergies: e.target.value })} className="input-field" />
             <textarea
-              placeholder="Descripción del registro"
+              placeholder="Descripcion"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="input-field h-24"
+              className="input-field min-h-[100px] md:col-span-2"
               required
             />
-
-            <input
-              type="text"
-              placeholder="Vacunas (coma separada)"
-              value={formData.vaccines}
-              onChange={(e) => setFormData({ ...formData, vaccines: e.target.value })}
-              className="input-field"
-            />
-
-            <input
-              type="text"
-              placeholder="Alergias (coma separada)"
-              value={formData.allergies}
-              onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
-              className="input-field"
-            />
-
-            <button type="submit" disabled={submitting} className="w-full btn-primary py-3 disabled:opacity-50">
-              {submitting ? 'Guardando...' : 'Guardar registro'}
-            </button>
-          </form>
-        </div>
+          </div>
+          <button type="submit" disabled={submitting} className="btn-primary w-full justify-center">
+            {submitting ? 'Guardando...' : 'Guardar registro'}
+          </button>
+        </form>
       )}
 
-      <div>
+      <section>
+        <div className="section-divider mb-5">
+          <span>Linea de tiempo</span>
+        </div>
         {timeline.length === 0 ? (
-          <div className="card p-12 text-center">
-            <p className="text-gray-600">Sin registros aún. Crea uno para comenzar.</p>
+          <div className="animalist-card text-center">
+            <p className="editorial-quote text-2xl text-dark">Aun no hay registros. Empieza acompanando esta historia.</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {timeline.map((entry, idx) => (
-              <div
-                key={entry.id || idx}
-                className={`card p-6 border-l-4 animate-in ${entry.kind === 'audit' ? 'border-accent' : 'border-brand'}`}
-                style={{ animationDelay: `${idx * 0.05}s` }}
-              >
-                <div className="flex justify-between items-start mb-3 gap-4">
-                  <div>
-                    <p className={`font-bold text-lg capitalize ${entry.kind === 'audit' ? 'text-accent' : 'text-brand'}`}>
-                      {entry.kind === 'audit' ? `Auditoria · ${entry.title}` : entry.title}
-                    </p>
-                    <p className="text-sm text-gray-600">{formatDateTime(entry.createdAt)}</p>
+          <ol className="space-y-4">
+            {timeline.map((entry) => (
+              <li key={entry.id} className="animalist-card">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`pill-tab ${entry.kind === 'audit' ? 'pill-tab-active' : ''}`}>
+                      {entry.title}
+                    </span>
+                    <span className="text-xs uppercase tracking-[0.2em] text-dark/45">{formatDateTime(entry.createdAt)}</span>
                   </div>
-                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">{entry.actorName}</span>
+                  <span className="text-xs text-dark/55">{entry.actorName}</span>
                 </div>
-                <p className="text-gray-700 mb-3">{entry.description}</p>
-
-                {entry.vaccines?.length > 0 && (
-                  <div className="mb-2">
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Vacunas:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {entry.vaccines.map((item, index) => (
-                        <span key={index} className="tag">{item}</span>
-                      ))}
-                    </div>
+                {entry.description && <p className="mt-3 text-sm text-dark/74">{entry.description}</p>}
+                {entry.vaccines?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.vaccines.map((item) => (
+                      <span key={item} className="tag">{item}</span>
+                    ))}
                   </div>
-                )}
-
-                {entry.allergies?.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Alergias:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {entry.allergies.map((item, index) => (
-                        <span key={index} className="inline-block rounded-md bg-red-100 px-2 py-1 text-xs text-red-700">
-                          {item}
-                        </span>
-                      ))}
-                    </div>
+                ) : null}
+                {entry.allergies?.length ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {entry.allergies.map((item) => (
+                      <span key={item} className="tag" style={{ color: '#A05D33', borderColor: 'rgba(201, 122, 75, 0.3)', background: 'rgba(201, 122, 75, 0.08)' }}>
+                        {item}
+                      </span>
+                    ))}
                   </div>
-                )}
-              </div>
+                ) : null}
+              </li>
             ))}
-          </div>
+          </ol>
         )}
-      </div>
+      </section>
     </div>
   )
 }

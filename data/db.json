@@ -48,6 +48,16 @@
       "passwordSalt": "6f289d5dea04af18b5404555bb40cee8",
       "passwordHash": "7a4534614e20e1ebb0ebe4a98d9a5363a3e13fda1018e6a2336892f6533d8837d31acf9e6ccd4ae9dfb7ec844f61c368d2e375bf8c9fa9aff480be624c195b02",
       "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "USR-D692B1AB",
+      "role": "owner",
+      "fullName": "Rodo Tavera",
+      "dni": "60435585",
+      "email": "yasstavera@gmail.com",
+      "passwordSalt": "557abd7270a62605eec7ab813c6e29ba",
+      "passwordHash": "c94b47152e62fe16cab977df1e67702775114b4fe09b19b586cd148985627023db112bb2fa76f6d5f3668b0fbd4340dc875f235dcc8f28c0068746663809d48a",
+      "createdAt": "2026-06-09T06:54:22.515Z"
     }
   ],
   "pets": [
@@ -85,6 +95,37 @@
         "pattern": "stripe",
         "accessory": "collar"
       }
+    },
+    {
+      "petId": "PET-2026-0002",
+      "name": "Kaila",
+      "species": "perro",
+      "sex": "macho",
+      "birthDate": "2026-06-02",
+      "traits": "",
+      "ownerComment": "",
+      "estimatedBreed": "Mestizo (estimacion IA)",
+      "ownerDni": "60435585",
+      "allergies": [
+        "pollo"
+      ],
+      "vaccines": [
+        "rabia",
+        "parvovirus",
+        "moquillo"
+      ],
+      "avatarConfig": {
+        "furColor": "#AE704B",
+        "innerColor": "#F0D1B6",
+        "accessoryColor": "#DC2626",
+        "eyeColor": "#252525",
+        "pattern": "spots",
+        "accessory": "bow"
+      },
+      "familyDnis": [],
+      "authorizedVetRucs": [],
+      "createdAt": "2026-06-09T06:55:00.428Z",
+      "updatedAt": "2026-06-09T06:55:41.978Z"
     }
   ],
   "records": [
@@ -103,6 +144,20 @@
       "actorId": "20123456789",
       "clinicName": "Clinica Animal Sur",
       "createdAt": "2026-04-24T03:02:20.346Z"
+    },
+    {
+      "id": "REC-3309CB66",
+      "petId": "PET-2026-0002",
+      "type": "alta",
+      "description": "Ficha digital creada por el dueno.",
+      "vaccinesAdded": [],
+      "allergiesAdded": [],
+      "attachments": [],
+      "actorRole": "owner",
+      "actorName": "Rodo Tavera",
+      "actorId": "60435585",
+      "clinicName": "",
+      "createdAt": "2026-06-09T06:55:00.428Z"
     }
   ],
   "clinics": [
@@ -167,6 +222,26 @@
       "actorId": "44556677",
       "details": "Dueno actualizo datos base",
       "createdAt": "2026-05-28T05:14:09.056Z"
+    },
+    {
+      "id": "AUD-75329141",
+      "petId": "PET-2026-0002",
+      "action": "pet-created",
+      "actorRole": "owner",
+      "actorName": "Rodo Tavera",
+      "actorId": "60435585",
+      "details": "Se creo la ficha digital inicial",
+      "createdAt": "2026-06-09T06:55:00.428Z"
+    },
+    {
+      "id": "AUD-8546C525",
+      "petId": "PET-2026-0002",
+      "action": "pet-updated",
+      "actorRole": "owner",
+      "actorName": "Rodo Tavera",
+      "actorId": "60435585",
+      "details": "Dueno actualizo datos base",
+      "createdAt": "2026-06-09T06:55:41.978Z"
     }
   ]
 }

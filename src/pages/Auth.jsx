@@ -1,277 +1,288 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+﻿import { useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import PetAvatar3D from '../components/PetAvatar3D'
+import { useNavigate } from 'react-router-dom'
+import { useGSAP } from '../lib/gsap'
+import { attachHoverLift, attachMagnetic, riseIn } from '../lib/motion'
+
+const ROLES = [
+  { value: 'owner', label: 'Dueno', helper: 'Registra y cuida a tu mascota.' },
+  { value: 'family', label: 'Familia', helper: 'Acompanias el cuidado desde cerca.' },
+  { value: 'vet', label: 'Veterinaria', helper: 'Atiendes y registras clinica.' },
+  { value: 'airline', label: 'Aerolinea', helper: 'Verificas aptitud de viaje.' },
+  { value: 'admin', label: 'Administracion', helper: 'Supervisas todo el ecosistema.' },
+]
+
+const REGISTER_FIELDS = {
+  owner: [
+    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetHelp', required: true },
+    { name: 'dni', label: 'DNI', type: 'text', placeholder: '8 digitos', pattern: '\\d{8}', maxLength: 8, required: true },
+  ],
+  family: [
+    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetHelp', required: true },
+    { name: 'dni', label: 'DNI', type: 'text', placeholder: '8 digitos', pattern: '\\d{8}', maxLength: 8, required: true },
+    { name: 'ownerDni', label: 'DNI del dueno', type: 'text', placeholder: 'DNI de quien te compartio la mascota', pattern: '\\d{8}', maxLength: 8, required: true },
+  ],
+  vet: [
+    { name: 'clinicName', label: 'Nombre de la veterinaria', type: 'text', placeholder: 'Como aparece en tus documentos', required: true },
+    { name: 'ruc', label: 'RUC', type: 'text', placeholder: '11 digitos', pattern: '\\d{11}', maxLength: 11, required: true },
+  ],
+  airline: [
+    { name: 'airlineCode', label: 'Codigo IATA', type: 'text', placeholder: 'Ej. LA', maxLength: 4, required: true },
+  ],
+  admin: [
+    { name: 'adminKey', label: 'Codigo de administrador', type: 'password', placeholder: 'Clave interna', required: true },
+  ],
+}
+
+const buildRegisterPayload = (role, form) => {
+  const base = { email: form.email, password: form.password }
+  if (role === 'owner') return { ...base, fullName: form.fullName, dni: form.dni }
+  if (role === 'family') return { ...base, fullName: form.fullName, dni: form.dni, ownerDni: form.ownerDni }
+  if (role === 'vet') return { ...base, clinicName: form.clinicName, ruc: form.ruc }
+  if (role === 'airline') return { ...base, airlineCode: form.airlineCode }
+  return base
+}
+
+const buildLoginPayload = (form) => ({
+  role: form.role,
+  identifier: form.identifier,
+  password: form.password,
+})
+
+const PILLARS = [
+  { title: 'Una cartilla digital por mascota', text: 'Vacunas, alergias, controles y contactos en una sola ficha.' },
+  { title: 'Compartida con tu circulo', text: 'Familia, clinicas y viajes acceden solo donde tu decides.' },
+  { title: 'Verificacion para volar', text: 'Consulta aptitud de viaje sin papeles sueltos.' },
+]
 
 export default function Auth() {
-  const navigate = useNavigate()
   const { login, register } = useAuth()
-  const [tab, setTab] = useState('login')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [role, setRole] = useState('owner')
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
+  const navigate = useNavigate()
+  const [mode, setMode] = useState('login')
+  const [form, setForm] = useState({
+    fullName: '',
     dni: '',
     ownerDni: '',
+    clinicName: '',
     ruc: '',
-    clinic: '',
+    airlineCode: '',
+    adminKey: '',
+    email: '',
+    identifier: '',
+    password: '',
+    role: 'owner',
   })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const rootRef = useRef(null)
+  const heroRef = useRef(null)
 
-  useEffect(() => {
-    if (tab === 'register' && ['airline', 'admin'].includes(role)) setRole('owner')
-  }, [tab, role])
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setForm((current) => ({ ...current, [name]: value }))
+  }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setSubmitting(true)
     setError('')
-  }
-
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoading(true)
     try {
-      let credentials = {}
-      if (role === 'owner' || role === 'family') {
-        credentials = { dni: formData.dni, password: formData.password, role }
-      } else if (role === 'vet') {
-        credentials = { ruc: formData.ruc, password: formData.password, role }
-      } else if (role === 'airline') {
-        credentials = { code: formData.ruc, password: formData.password, role }
-      } else if (role === 'admin') {
-        credentials = { email: formData.email, identifier: formData.email, password: formData.password, role }
+      if (mode === 'login') {
+        await login(buildLoginPayload(form))
+      } else {
+        const endpoint = `/api/register/${form.role}`
+        const payload = buildRegisterPayload(form.role, form)
+        await register(endpoint, payload)
       }
-      
-      const session = await login(credentials)
-      const nextRoute = session.user?.role === 'admin' ? '/admin' : session.user?.role === 'airline' ? '/travel' : '/dashboard'
-      navigate(nextRoute)
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Error en el login')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleRegister = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    try {
-      let endpoint, data
-      if (role === 'owner') {
-        endpoint = '/api/register/owner'
-        data = { fullName: formData.name, dni: formData.dni, email: formData.email, password: formData.password }
-      } else if (role === 'family') {
-        endpoint = '/api/register/family'
-        data = { fullName: formData.name, dni: formData.dni, ownerDni: formData.ownerDni, email: formData.email, password: formData.password }
-      } else if (role === 'vet') {
-        endpoint = '/api/register/vet'
-        data = { clinicName: formData.clinic, ruc: formData.ruc, email: formData.email, password: formData.password }
-      }
-      
-      await register(endpoint, data)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Error en el registro')
+      const message = err.response?.data?.message || err.message || 'No pudimos completar la operacion.'
+      setError(message)
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
-  const availableRoles = tab === 'register' ? ['owner', 'family', 'vet'] : ['owner', 'family', 'vet', 'airline', 'admin']
+  const registerFields = REGISTER_FIELDS[form.role] || []
+
+  useGSAP(
+    () => {
+      riseIn(heroRef.current?.querySelectorAll('[data-rise]') || [], { y: 18, stagger: 0.08, duration: 0.7 })
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
+      return () => {
+        cleanHover()
+        cleanMagnetic()
+      }
+    },
+    { scope: rootRef, dependencies: [mode] }
+  )
 
   return (
-    <div className="animate-fade">
-      <div className="grid gap-8 xl:grid-cols-[1.02fr_0.98fr]">
-        <section className="space-y-6 animate-in">
-          <div className="hero-panel space-y-6" data-hero>
-            <span className="section-kicker" data-hero-line>Acceso multirol</span>
-            <div className="space-y-4">
-              <h1 className="text-6xl leading-[0.96] text-dark md:text-7xl" data-hero-line>
-                Entrar a VetHelp ahora se siente tan cuidado como el resto del producto.
-              </h1>
-              <p className="max-w-2xl text-lg text-dark/70" data-hero-line>
-                Dueños, familia, clinicas, aerolineas y admin comparten el mismo sistema, pero cada uno entra desde una superficie clara, elegante y con foco en la tarea.
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                { value: '5', label: 'roles activos' },
-                { value: '1', label: 'nucleo clinico' },
-                { value: '0', label: 'ruido visual innecesario' },
-              ].map((item) => (
-                <div key={item.label} className="metric-pill">
-                  <p className="text-2xl font-black text-dark">{item.value}</p>
-                  <p className="mt-1 text-sm text-dark/58">{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
-            <article className="card-soft" data-reveal>
-              <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
-                <PetAvatar3D
-                  petName="Luna"
-                  species="perro"
-                  avatarConfig={{
-                    furColor: '#C89A72',
-                    innerColor: '#F2D7BF',
-                    accessoryColor: '#0F766E',
-                    eyeColor: '#17333B',
-                    pattern: 'mask',
-                    accessory: 'collar',
-                  }}
-                  size="sm"
-                />
-                <div>
-                  <p className="eyebrow-label">Una ficha, multiples accesos</p>
-                  <h2 className="mt-1 text-3xl text-dark">El mismo producto para toda la operacion.</h2>
-                  <p className="mt-2 text-sm text-dark/65">La identidad de la mascota se mantiene consistente desde el login hasta el dashboard.</p>
-                </div>
+    <div className="grid items-stretch gap-6 md:grid-cols-[1.05fr_0.95fr]" ref={rootRef}>
+      <section className="auth-hero relative" ref={heroRef} data-rise>
+        <p className="eyebrow-label text-cream/70" data-rise>VetHelp · cartilla digital animalista</p>
+        <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl" data-rise>
+          La cartilla digital
+          <br />
+          que cuida a quien amas.
+        </h1>
+        <p className="mt-4 max-w-md text-sm text-cream/80" data-rise>
+          Una ficha clinica sobria, viva y compartida para cada mascota. Vacunas, alergias, controles
+          y viajes en un solo lugar, lista cuando la necesitas.
+        </p>
+        <ul className="mt-6 space-y-3" data-rise>
+          {PILLARS.map((pillar) => (
+            <li key={pillar.title} className="flex items-start gap-3 rounded-2xl border border-cream/15 bg-cream/5 px-4 py-3 backdrop-blur-sm" data-hover>
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-cream" aria-hidden="true" />
+              <div>
+                <p className="font-display text-base text-cream">{pillar.title}</p>
+                <p className="mt-1 text-xs text-cream/70">{pillar.text}</p>
               </div>
-            </article>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-cream/20 bg-cream/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-cream" data-rise>
+          <span className="h-1.5 w-1.5 rounded-full bg-cream" />
+          Funcion principal · cartilla digital
+        </div>
+      </section>
 
-            <article className="card" data-reveal>
-              <p className="eyebrow-label">Roles disponibles</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {[
-                  { title: 'Duenos', desc: 'Registran y comparten la ficha.' },
-                  { title: 'Familia', desc: 'Consulta segura y concreta.' },
-                  { title: 'Clinicas', desc: 'Registran continuidad clinica.' },
-                  { title: 'Admin', desc: 'Supervisa operacion completa.' },
-                ].map((item) => (
-                  <div key={item.title} className="rounded-[0.95rem] border border-dark/8 bg-white/70 px-4 py-4">
-                    <p className="font-semibold text-dark">{item.title}</p>
-                    <p className="mt-1 text-sm text-dark/62">{item.desc}</p>
-                  </div>
+      <form onSubmit={handleSubmit} className="auth-card space-y-5" data-rise>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="eyebrow-label text-brand">Acceso VetHelp</p>
+            <h2 className="mt-1 font-display text-2xl text-dark">{mode === 'login' ? 'Iniciar sesion' : 'Crear cuenta'}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError('') }}
+            className="text-xs uppercase tracking-[0.2em] text-brand transition hover:text-brand-strong"
+          >
+            {mode === 'login' ? 'Crear cuenta' : 'Ya tengo cuenta'}
+          </button>
+        </div>
+
+        {mode === 'register' ? (
+          <>
+            <label className="block">
+              <span className="eyebrow-label">Rol</span>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {ROLES.map((role) => (
+                  <button
+                    key={role.value}
+                    type="button"
+                    onClick={() => setForm((current) => ({ ...current, role: role.value }))}
+                    data-hover
+                    className={`pill-tab w-full text-left ${form.role === role.value ? 'pill-tab-active' : ''}`}
+                  >
+                    <p className="text-sm font-medium">{role.label}</p>
+                    <p className="mt-1 text-[11px] opacity-80">{role.helper}</p>
+                  </button>
                 ))}
               </div>
-            </article>
+            </label>
+
+            {registerFields.map((field) => (
+              <label key={field.name} className="block">
+                <span className="eyebrow-label">{field.label}</span>
+                <input
+                  type={field.type || 'text'}
+                  name={field.name}
+                  value={form[field.name] || ''}
+                  onChange={handleChange}
+                  className="input-field mt-2"
+                  placeholder={field.placeholder}
+                  pattern={field.pattern}
+                  maxLength={field.maxLength}
+                  required={field.required}
+                />
+              </label>
+            ))}
+
+            <label className="block">
+              <span className="eyebrow-label">Correo</span>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className="input-field mt-2"
+                placeholder="tu@correo.com"
+                required
+              />
+            </label>
+
+            <label className="block">
+              <span className="eyebrow-label">Contrasena</span>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="input-field mt-2"
+                placeholder="Minimo 6 caracteres"
+                minLength={6}
+                required
+              />
+            </label>
+          </>
+        ) : (
+          <>
+            <label className="block">
+              <span className="eyebrow-label">Rol</span>
+              <select name="role" value={form.role} onChange={handleChange} className="input-field mt-2">
+                {ROLES.map((role) => (
+                  <option key={role.value} value={role.value}>{role.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="eyebrow-label">{form.role === 'admin' ? 'Correo administrador' : form.role === 'vet' ? 'Correo o RUC' : form.role === 'airline' ? 'Correo o codigo IATA' : 'Correo o DNI'}</span>
+              <input
+                type="text"
+                name="identifier"
+                value={form.identifier}
+                onChange={handleChange}
+                className="input-field mt-2"
+                placeholder="Identificador de acceso"
+                required
+              />
+            </label>
+
+            <label className="block">
+              <span className="eyebrow-label">Contrasena</span>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                className="input-field mt-2"
+                placeholder="Minimo 6 caracteres"
+                minLength={6}
+                required
+              />
+            </label>
+          </>
+        )}
+
+        {error && (
+          <div className="rounded-2xl border border-red-200/70 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
           </div>
+        )}
 
-          <div className="showcase-stage" data-reveal>
-            <p className="text-sm uppercase tracking-[0.24em] text-white/58">Credenciales demo</p>
-            <div className="mt-4 grid gap-3 text-sm text-white/78 sm:grid-cols-2">
-              <p><strong>Dueno:</strong> 44556677 / demo123</p>
-              <p><strong>Vet:</strong> 20123456789 / demo123</p>
-              <p><strong>Aerolinea:</strong> AERO001 / air12345</p>
-              <p><strong>Admin:</strong> admin@vethelp.cloud / admin123</p>
-            </div>
-          </div>
-        </section>
+        <button type="submit" disabled={submitting} className="btn-primary w-full justify-center" data-magnetic>
+          {submitting ? 'Procesando...' : mode === 'login' ? 'Entrar a VetHelp' : 'Crear mi cartilla'}
+        </button>
 
-        <section className="hero-panel animate-in" style={{ animationDelay: '0.1s' }} data-hero>
-          <div className="mb-8 flex items-start justify-between gap-4">
-            <div>
-              <p className="eyebrow-label">Acceso seguro</p>
-              <h2 className="mt-2 text-5xl leading-[0.98] text-dark">Entrar o crear cuenta.</h2>
-            </div>
-            <div className="rounded-[0.95rem] border border-dark/8 bg-white/64 px-4 py-3 text-right shadow-sm">
-              <p className="text-[11px] uppercase tracking-[0.22em] text-dark/45">Estado</p>
-              <p className="mt-1 text-sm font-semibold text-dark">{tab === 'login' ? 'Acceso activo' : 'Registro activo'}</p>
-            </div>
-          </div>
-
-          <div className="mb-6 grid grid-cols-2 gap-3 rounded-[1rem] border border-dark/8 bg-white/56 p-2">
-            <button
-              onClick={() => setTab('login')}
-              className={`flex-1 rounded-lg px-5 py-3 font-semibold transition-all ${
-                tab === 'login' ? 'bg-dark text-white shadow-lg shadow-dark/10' : 'bg-white/65 text-dark/60'
-              }`}
-            >
-              Acceso
-            </button>
-            <button
-              onClick={() => setTab('register')}
-              className={`flex-1 rounded-lg px-5 py-3 font-semibold transition-all ${
-                tab === 'register' ? 'bg-dark text-white shadow-lg shadow-dark/10' : 'bg-white/65 text-dark/60'
-              }`}
-            >
-              Registro
-            </button>
-          </div>
-
-          {error && (
-            <div className="mb-6 rounded-[0.85rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 animate-in">
-              {error}
-            </div>
-          )}
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold mb-3 text-dark/70">Tipo de Cuenta</label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {availableRoles.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRole(r)}
-                  className={`rounded-lg px-3 py-3 text-sm font-semibold transition-all ${
-                    role === r ? 'bg-gradient-pet text-white shadow-lg shadow-dark/10 -translate-y-0.5' : 'bg-white/70 text-dark/70 hover:bg-white'
-                  }`}
-                >
-                  {r === 'owner' && 'Dueno'}
-                  {r === 'family' && 'Familia'}
-                  {r === 'vet' && 'Veterinaria'}
-                  {r === 'airline' && 'Aerolinea'}
-                  {r === 'admin' && 'Admin'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {tab === 'login' && (
-            <form onSubmit={handleLogin} className="space-y-4">
-              {(role === 'owner' || role === 'family') && (
-                <input type="text" name="dni" placeholder="DNI (8 dígitos)" value={formData.dni} onChange={handleChange} className="input-field" required />
-              )}
-              {(role === 'vet' || role === 'airline') && (
-                <input type="text" name="ruc" placeholder={role === 'vet' ? 'RUC (11 dígitos)' : 'Código Aerolínea'} value={formData.ruc} onChange={handleChange} className="input-field" required />
-              )}
-              {role === 'admin' && (
-                <input type="email" name="email" placeholder="Correo administrador" value={formData.email} onChange={handleChange} className="input-field" required />
-              )}
-              <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} className="input-field" required />
-              <button type="submit" disabled={loading} className="w-full justify-center btn-primary py-3 disabled:opacity-50">
-                {loading ? 'Accediendo...' : 'Entrar a VetHelp'}
-              </button>
-            </form>
-          )}
-
-          {tab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-4">
-              <input type="text" name="name" placeholder="Nombre completo" value={formData.name} onChange={handleChange} className="input-field" required />
-              <input type="email" name="email" placeholder="Correo electrónico" value={formData.email} onChange={handleChange} className="input-field" required />
-              {(role === 'owner' || role === 'family') && (
-                <input type="text" name="dni" placeholder="DNI (8 dígitos)" value={formData.dni} onChange={handleChange} className="input-field" required />
-              )}
-              {role === 'family' && (
-                <input type="text" name="ownerDni" placeholder="DNI del dueño principal" value={formData.ownerDni} onChange={handleChange} className="input-field" required />
-              )}
-              {role === 'vet' && (
-                <>
-                  <input type="text" name="clinic" placeholder="Nombre de Clínica" value={formData.clinic} onChange={handleChange} className="input-field" required />
-                  <input type="text" name="ruc" placeholder="RUC (11 dígitos)" value={formData.ruc} onChange={handleChange} className="input-field" required />
-                </>
-              )}
-              <input type="password" name="password" placeholder="Contraseña (mín. 6 caracteres)" value={formData.password} onChange={handleChange} className="input-field" minLength="6" required />
-              <button type="submit" disabled={loading} className="w-full justify-center btn-primary py-3 disabled:opacity-50">
-                {loading ? 'Registrando...' : 'Crear cuenta'}
-              </button>
-            </form>
-          )}
-
-          <div className="mt-6 rounded-[1rem] border border-dark/8 bg-gradient-soft p-5">
-            <p className="eyebrow-label">Por que esta pantalla cambio</p>
-            <p className="mt-2 text-sm text-dark/68">
-              El objetivo no era solo decorar el login: necesitaba verse mejor, sentirse mas serio y seguir siendo rapido de usar para cada rol del sistema.
-            </p>
-          </div>
-        </section>
-      </div>
+        <p className="text-center text-xs text-dark/55">
+          {mode === 'login'
+            ? 'Tu cartilla digital te espera: solo ingresa con tu correo o DNI.'
+            : 'Al crear tu cuenta podras registrar mascotas y armar su cartilla digital.'}
+        </p>
+      </form>
     </div>
   )
 }

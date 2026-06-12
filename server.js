@@ -682,7 +682,15 @@ function normalizeDatabase(candidate) {
   };
 
   normalized.users = normalized.users.map((user) => {
-    if (user.passwordHash && user.passwordSalt) return user;
+    if (user.passwordHash && user.passwordSalt) {
+      // Detectar hashes antiguos (SHA-256 simple de 64 hex) y regenerarlos con pbkdf2 (128 hex)
+      // para que verifyPassword() con timingSafeEqual no falle por diferencia de longitud.
+      if (user.passwordHash.length !== 128 || user.passwordSalt.length < 8) {
+        const pwd = hashPassword(clean(user.password || "demo123"));
+        return { ...user, passwordHash: pwd.hash, passwordSalt: pwd.salt };
+      }
+      return user;
+    }
 
     const pwd = hashPassword(clean(user.password || "demo123"));
     const migrated = { ...user, passwordHash: pwd.hash, passwordSalt: pwd.salt };

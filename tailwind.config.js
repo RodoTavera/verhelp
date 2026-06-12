@@ -7,15 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: '#0f766e',
-        accent: '#b5823d',
-        dark: '#17333b',
-        light: '#f4efe7',
-        surface: '#fff9f1',
+        brand: '#3F6B4D',
+        accent: '#C97A4B',
+        dark: '#1F2A1D',
+        light: '#F5F0E6',
+        surface: '#FBF8F2',
+        leaf: '#7FA08A',
+        sand: '#E6D8BE',
+        terracotta: '#C97A4B',
+        ink: '#1F2A1D',
+        moss: '#3F6B4D',
+        cream: '#FBF8F2',
       },
       fontFamily: {
-        sans: ['Manrope', 'system-ui', 'sans-serif'],
-        display: ['Cormorant Garamond', 'Manrope', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Inter', 'serif'],
       },
       animation: {
         'rise': 'rise 0.6s ease-out',
@@ -37,8 +43,10 @@ export default {
         },
       },
       backgroundImage: {
-        'gradient-pet': 'linear-gradient(135deg, #0f766e 0%, #17333b 100%)',
-        'gradient-soft': 'linear-gradient(135deg, rgba(15, 118, 110, 0.08) 0%, rgba(181, 130, 61, 0.12) 100%)',
+        'gradient-pet': 'linear-gradient(135deg, #3F6B4D 0%, #1F2A1D 100%)',
+        'gradient-soft': 'linear-gradient(135deg, rgba(63, 107, 77, 0.08) 0%, rgba(201, 122, 75, 0.1) 100%)',
+        'gradient-animal': 'linear-gradient(140deg, #F5F0E6 0%, #E6D8BE 100%)',
+        'gradient-meadow': 'linear-gradient(180deg, rgba(127, 160, 138, 0.18) 0%, rgba(245, 240, 230, 0) 100%)',
       },
     },
   },
