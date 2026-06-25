@@ -26,6 +26,21 @@ export default function Records() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState(INITIAL_FORM)
+  const rootRef = useRef(null)
+
+  useGSAP(
+    () => {
+      if (!rootRef.current) return undefined
+      scrollReveal(rootRef.current, '[data-rise]')
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
+      return () => {
+        cleanHover()
+        cleanMagnetic()
+      }
+    },
+    { scope: rootRef, dependencies: [] }
+  )
 
   useEffect(() => {
     void fetchPets()
@@ -109,20 +124,6 @@ export default function Records() {
       actorName: entry.actorName,
     })),
   ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-  const rootRef = useRef(null)
-  useGSAP(
-    () => {
-      scrollReveal(rootRef.current, '[data-rise]')
-      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
-      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
-      return () => {
-        cleanHover()
-        cleanMagnetic()
-      }
-    },
-    { scope: rootRef, dependencies: [timeline, selectedPetId] }
-  )
 
   return (
     <div className="space-y-10" ref={rootRef}>

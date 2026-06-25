@@ -49,6 +49,7 @@ app.get("/api/clinics", (req, res) => {
 app.post("/api/register/owner", (req, res) => {
   const fullName = clean(req.body.fullName);
   const dni = clean(req.body.dni);
+  const phone = clean(req.body.phone);
   const email = clean(req.body.email).toLowerCase();
   const password = clean(req.body.password);
 
@@ -67,6 +68,7 @@ app.post("/api/register/owner", (req, res) => {
     role: "owner",
     fullName,
     dni,
+    phone,
     email,
     passwordSalt: pwd.salt,
     passwordHash: pwd.hash,

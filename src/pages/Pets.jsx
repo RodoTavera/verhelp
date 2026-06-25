@@ -46,6 +46,21 @@ export default function Pets() {
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const rootRef = useRef(null)
+
+  useGSAP(
+    () => {
+      if (!rootRef.current) return undefined
+      scrollReveal(rootRef.current, '[data-rise]')
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
+      return () => {
+        cleanHover()
+        cleanMagnetic()
+      }
+    },
+    { scope: rootRef, dependencies: [] }
+  )
 
   useEffect(() => {
     void fetchPets()
@@ -179,20 +194,6 @@ export default function Pets() {
 
   const managedPet = pets.find((pet) => pet.id === management.petId)
   const ownerMode = user?.role === 'owner'
-  const rootRef = useRef(null)
-  useGSAP(
-    () => {
-      scrollReveal(rootRef.current, '[data-rise]')
-      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
-      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
-      return () => {
-        cleanHover()
-        cleanMagnetic()
-      }
-    },
-    { scope: rootRef, dependencies: [pets, management.petId] }
-  )
- data-magnetic
   return (
     <div className="space-y-10" ref={rootRef}>
       <section className="animalist-card" data-rise>

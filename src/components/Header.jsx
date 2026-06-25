@@ -38,7 +38,6 @@ export default function Header() {
 
   const baseLinks = [
     { to: '/', label: 'Inicio' },
-    { to: '/clinics', label: 'Clinicas' },
     { to: '/guides', label: 'Guias' },
   ]
 

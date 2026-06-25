@@ -14,6 +14,21 @@ export default function Admin() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState(INITIAL_CLINIC)
+  const rootRef = useRef(null)
+
+  useGSAP(
+    () => {
+      if (!rootRef.current) return undefined
+      scrollReveal(rootRef.current, '[data-rise]')
+      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
+      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
+      return () => {
+        cleanHover()
+        cleanMagnetic()
+      }
+    },
+    { scope: rootRef, dependencies: [] }
+  )
 
   useEffect(() => {
     void fetchAdminData()
@@ -68,20 +83,6 @@ export default function Admin() {
   const recentUsers = overview?.recentUsers || []
   const recentRecords = overview?.recentRecords || []
 
-  const rootRef = useRef(null)
-  useGSAP(
-    () => {
-      scrollReveal(rootRef.current, '[data-rise]')
-      const cleanHover = attachHoverLift(rootRef.current, '[data-hover]')
-      const cleanMagnetic = attachMagnetic(rootRef.current, '[data-magnetic]')
-      return () => {
-        cleanHover()
-        cleanMagnetic()
-      }
-    },
-    { scope: rootRef, dependencies: [overview] }
-  )
-
   return (
     <div className="space-y-10" ref={rootRef}>
       <section className="animalist-card" data-rise>
@@ -92,9 +93,9 @@ export default function Admin() {
             ? 'Acompanias todo el ecosistema. Cuida los datos como cuidas a cada mascota.'
             : 'Vista general de la operacion. La informacion aqui respira y se lee rapido.'}
         </p>
-        <div className="mt-5 flex flex-wrap gap-2"> data-hover
+        <div className="mt-5 flex flex-wrap gap-2">
           {Object.entries(roleBreakdown).map(([role, total]) => (
-            <span key={role} className="pet-species-pill capitalize">{role}: {total}</span>
+            <span key={role} className="pet-species-pill capitalize" data-hover>{role}: {total}</span>
           ))}
         </div>
       </section>

@@ -10,7 +10,6 @@ import Dashboard from './pages/Dashboard'
 import Pets from './pages/Pets'
 import Records from './pages/Records'
 import Travel from './pages/Travel'
-import Clinics from './pages/Clinics'
 import Guides from './pages/Guides'
 import Admin from './pages/Admin'
 
@@ -22,7 +21,6 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/clinics" element={<Clinics />} />
             <Route path="/guides" element={<Guides />} />
             
             {/* Protected Routes */}

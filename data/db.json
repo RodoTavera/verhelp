@@ -58,6 +58,36 @@
       "passwordSalt": "557abd7270a62605eec7ab813c6e29ba",
       "passwordHash": "c94b47152e62fe16cab977df1e67702775114b4fe09b19b586cd148985627023db112bb2fa76f6d5f3668b0fbd4340dc875f235dcc8f28c0068746663809d48a",
       "createdAt": "2026-06-09T06:54:22.515Z"
+    },
+    {
+      "id": "USR-27EEC03D",
+      "role": "owner",
+      "fullName": "Fabri alias error",
+      "dni": "99988877",
+      "email": "fabri@gmail.com",
+      "passwordSalt": "3f4cb8a8c7b8802fb8da48d9e9ea335b",
+      "passwordHash": "3b03ae7ad0ec5c2e0ba1213f3d2cd639c099dbb15dcc9755b04e665cce95bdb13a6a87b6a8600470a55303ca5114451b586c70e794ab82b638ab540baa94d5b5",
+      "createdAt": "2026-06-18T23:35:28.413Z"
+    },
+    {
+      "id": "USR-6CF948C0",
+      "role": "vet",
+      "clinicName": "Veteria Error",
+      "ruc": "99999999988",
+      "email": "fabribellako@gmail.com",
+      "passwordSalt": "6198579888761dfeeb1520e5ceaf07e7",
+      "passwordHash": "adad6ed70d13fbbf8dcf01393066ef8d0bb67d76b35a7420ffab332a46e6c16c30053ff4f9a32916870c11fb86be5b3e3b0ceeb9fb17e6f83c8d90603f188f7e",
+      "createdAt": "2026-06-19T00:04:59.391Z"
+    },
+    {
+      "id": "USR-8174A274",
+      "role": "owner",
+      "fullName": "Rodoooo",
+      "dni": "60435586",
+      "email": "rooodo@gmail.com",
+      "passwordSalt": "6deceae04e4733ed64fedb3a672f8321",
+      "passwordHash": "78bacdbe0bfe9012350d1214c7f6c4424cc0e0dcba9b8ad080514c8d26737015b9cd54af8e5007613dd9e218ce9853020b08fe6ab8b9f041449643729fc149dc",
+      "createdAt": "2026-06-25T21:59:57.980Z"
     }
   ],
   "pets": [
@@ -126,6 +156,39 @@
       "authorizedVetRucs": [],
       "createdAt": "2026-06-09T06:55:00.428Z",
       "updatedAt": "2026-06-09T06:55:41.978Z"
+    },
+    {
+      "petId": "PET-2026-0003",
+      "name": "Kaila",
+      "species": "pajaro",
+      "sex": "hembra",
+      "birthDate": "2026-06-03",
+      "traits": "",
+      "ownerComment": "la paloma es gay",
+      "estimatedBreed": "Especie no canina (estimacion IA)",
+      "ownerDni": "99988877",
+      "allergies": [
+        "pollo",
+        "al viento"
+      ],
+      "vaccines": [
+        "rabia",
+        "parvovirus",
+        "moquillo",
+        "contra el vih"
+      ],
+      "avatarConfig": {
+        "furColor": "#000000",
+        "innerColor": "#00A6FF",
+        "accessoryColor": "#FFFFFF",
+        "eyeColor": "#003DCC",
+        "pattern": "none",
+        "accessory": "bow"
+      },
+      "familyDnis": [],
+      "authorizedVetRucs": [],
+      "createdAt": "2026-06-19T00:02:11.352Z",
+      "updatedAt": "2026-06-19T00:02:55.369Z"
     }
   ],
   "records": [
@@ -158,6 +221,44 @@
       "actorId": "60435585",
       "clinicName": "",
       "createdAt": "2026-06-09T06:55:00.428Z"
+    },
+    {
+      "id": "REC-E58D3F8A",
+      "petId": "PET-2026-0003",
+      "type": "alta",
+      "description": "Ficha digital creada por el dueno.",
+      "vaccinesAdded": [
+        "rabia",
+        "parvovirus",
+        "moquillo"
+      ],
+      "allergiesAdded": [
+        "pollo"
+      ],
+      "attachments": [],
+      "actorRole": "owner",
+      "actorName": "Fabri alias error",
+      "actorId": "99988877",
+      "clinicName": "",
+      "createdAt": "2026-06-19T00:02:11.352Z"
+    },
+    {
+      "id": "REC-1D3A0949",
+      "petId": "PET-2026-0003",
+      "type": "consulta",
+      "description": "nose",
+      "vaccinesAdded": [
+        "contra el vih"
+      ],
+      "allergiesAdded": [
+        "al viento"
+      ],
+      "attachments": [],
+      "actorRole": "owner",
+      "actorName": "Fabri alias error",
+      "actorId": "99988877",
+      "clinicName": "",
+      "createdAt": "2026-06-19T00:02:55.369Z"
     }
   ],
   "clinics": [
@@ -242,6 +343,26 @@
       "actorId": "60435585",
       "details": "Dueno actualizo datos base",
       "createdAt": "2026-06-09T06:55:41.978Z"
+    },
+    {
+      "id": "AUD-4865AEF1",
+      "petId": "PET-2026-0003",
+      "action": "pet-created",
+      "actorRole": "owner",
+      "actorName": "Fabri alias error",
+      "actorId": "99988877",
+      "details": "Se creo la ficha digital inicial",
+      "createdAt": "2026-06-19T00:02:11.352Z"
+    },
+    {
+      "id": "AUD-58712134",
+      "petId": "PET-2026-0003",
+      "action": "record-added",
+      "actorRole": "owner",
+      "actorName": "Fabri alias error",
+      "actorId": "99988877",
+      "details": "Dueno agrego registro consulta",
+      "createdAt": "2026-06-19T00:02:55.369Z"
     }
   ]
 }
