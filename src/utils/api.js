@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { sanitizeAvatarConfig } from '../shared/petAvatar'
 
-const baseURL = import.meta.env.VITE_API_URL || '/api'
+const baseURL = import.meta.env.VITE_API_URL || ''
 
 const isPlainObject = (value) => {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
