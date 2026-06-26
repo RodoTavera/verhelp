@@ -12,6 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 const DB_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DB_DIR, "db.json");
+const STATIC_DIR = path.join(__dirname, "dist");
 const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 
 const sessions = new Map();
@@ -633,10 +634,10 @@ app.get("/api/airline/verify/:petId", authRequired, airlineOnly, (req, res) => {
   });
 });
 
-app.use(express.static(__dirname));
+app.use(express.static(STATIC_DIR));
 
 app.get(/^\/(?!api).*/, (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(STATIC_DIR, "index.html"));
 });
 
 app.listen(PORT, () => {
