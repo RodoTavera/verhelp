@@ -81,7 +81,7 @@ export default function SplashScreen({ onDone, duration = 1700 }) {
         <PawMark className="h-12 w-12" />
         <span className="absolute -inset-3 rounded-[1.5rem] border border-brand/20 animate-pulse-soft" aria-hidden="true" />
       </div>
-      <p className="mt-6 font-display text-2xl text-dark">VetHelp</p>
+      <p className="mt-6 font-display text-2xl text-dark">VetRecord</p>
       <p className="mt-2 h-6 text-sm text-dark/65">
         {typed}
         <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 bg-brand animate-caret" aria-hidden="true" />

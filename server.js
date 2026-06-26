@@ -641,7 +641,7 @@ app.get(/^\/(?!api).*/, (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`VetHelp Cloud API running on http://localhost:${PORT}`);
+  console.log(`VetRecord Cloud API running on http://localhost:${PORT}`);
 });
 
 function loadDatabase() {

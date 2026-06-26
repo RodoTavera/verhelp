@@ -59,7 +59,7 @@ export default function Dashboard() {
           Hoy es un buen dia para cuidar a quien te cuida.
         </h1>
         <p className="mt-4 max-w-2xl text-sm text-dark/68">
-          VetHelp te acompana con calma. Tu panel de {user?.role || 'invitado'} esta listo para que tomes
+          VetRecord te acompana con calma. Tu panel de {user?.role || 'invitado'} esta listo para que tomes
           decisiones sin prisas.
         </p>
         <div className="mt-6 flex flex-wrap gap-2">

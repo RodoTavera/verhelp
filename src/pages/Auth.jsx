@@ -14,11 +14,11 @@ const ROLES = [
 
 const REGISTER_FIELDS = {
   owner: [
-    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetHelp', required: true },
+    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetRecord', required: true },
     { name: 'dni', label: 'DNI', type: 'text', placeholder: '8 digitos', pattern: '\\d{8}', maxLength: 8, required: true },
   ],
   family: [
-    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetHelp', required: true },
+    { name: 'fullName', label: 'Nombre completo', type: 'text', placeholder: 'Como te identifica VetRecord', required: true },
     { name: 'dni', label: 'DNI', type: 'text', placeholder: '8 digitos', pattern: '\\d{8}', maxLength: 8, required: true },
     { name: 'ownerDni', label: 'DNI del dueno', type: 'text', placeholder: 'DNI de quien te compartio la mascota', pattern: '\\d{8}', maxLength: 8, required: true },
   ],
@@ -121,7 +121,7 @@ export default function Auth() {
   return (
     <div className="grid items-stretch gap-6 md:grid-cols-[1.05fr_0.95fr]" ref={rootRef}>
       <section className="auth-hero relative" ref={heroRef} data-rise>
-        <p className="eyebrow-label text-cream/70" data-rise>VetHelp · cartilla digital animalista</p>
+        <p className="eyebrow-label text-cream/70" data-rise>VetRecord · cartilla digital animalista</p>
         <h1 className="mt-4 font-display text-4xl leading-tight text-cream md:text-5xl" data-rise>
           La cartilla digital
           <br />
@@ -151,7 +151,7 @@ export default function Auth() {
       <form onSubmit={handleSubmit} className="auth-card space-y-5" data-rise>
         <div className="flex items-center justify-between">
           <div>
-            <p className="eyebrow-label text-brand">Acceso VetHelp</p>
+            <p className="eyebrow-label text-brand">Acceso VetRecord</p>
             <h2 className="mt-1 font-display text-2xl text-dark">{mode === 'login' ? 'Iniciar sesion' : 'Crear cuenta'}</h2>
           </div>
           <button
@@ -274,7 +274,7 @@ export default function Auth() {
         )}
 
         <button type="submit" disabled={submitting} className="btn-primary w-full justify-center" data-magnetic>
-          {submitting ? 'Procesando...' : mode === 'login' ? 'Entrar a VetHelp' : 'Crear mi cartilla'}
+          {submitting ? 'Procesando...' : mode === 'login' ? 'Entrar a VetRecord' : 'Crear mi cartilla'}
         </button>
 
         <p className="text-center text-xs text-dark/55">

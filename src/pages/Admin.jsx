@@ -87,7 +87,7 @@ export default function Admin() {
     <div className="space-y-10" ref={rootRef}>
       <section className="animalist-card" data-rise>
         <p className="eyebrow-label">Centro de control</p>
-        <h1 className="mt-3 text-4xl text-dark">VetHelp en una mirada</h1>
+        <h1 className="mt-3 text-4xl text-dark">VetRecord en una mirada</h1>
         <p className="mt-3 max-w-2xl text-sm text-dark/68">
           {user?.role === 'admin'
             ? 'Acompanias todo el ecosistema. Cuida los datos como cuidas a cada mascota.'

@@ -1,6 +1,6 @@
-# VetHelp Cloud
+# VetRecord Cloud
 
-VetHelp Cloud es una SPA multirol para historial clínico digital de mascotas. La interfaz está construida con React + Vite y consume una API Express que centraliza autenticación, fichas, auditoría, verificación de viaje y administración.
+VetRecord Cloud es una SPA multirol para historial clínico digital de mascotas. La interfaz está construida con React + Vite y consume una API Express que centraliza autenticación, fichas, auditoría, verificación de viaje y administración.
 
 ## Arquitectura actual
 
@@ -54,7 +54,7 @@ VetHelp Cloud es una SPA multirol para historial clínico digital de mascotas. L
 - Familiar: `77889911` / `demo123`
 - Veterinaria: `20123456789` / `demo123`
 - Aerolínea: `AERO001` / `air12345`
-- Admin: `admin@vethelp.cloud` / `admin123`
+- Admin: `admin@vetrecord.cloud` / `admin123`
 
 ## Desarrollo
 

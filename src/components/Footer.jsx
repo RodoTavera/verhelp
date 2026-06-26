@@ -39,7 +39,7 @@ export default function Footer() {
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">Pet care cloud</p>
-                <h3 className="font-display text-2xl text-white">VetHelp</h3>
+                <h3 className="font-display text-2xl text-white">VetRecord</h3>
               </div>
             </div>
 
@@ -82,7 +82,7 @@ export default function Footer() {
           <div>
             <h4 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Compania</h4>
             <div className="mt-4 space-y-3 text-sm text-white/78">
-              <p>info@vethelp.cloud</p>
+              <p>info@vetrecord.cloud</p>
               <p>Operacion multirol con trazabilidad clinica real.</p>
               <p className="editorial-quote text-white/70">
                 "Cuidar a un animal es aprender a mirar el mundo con mas calma."
@@ -92,7 +92,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 text-center text-xs uppercase tracking-[0.2em] text-dark/45">
-          <p>© 2026 VetHelp Cloud · Cuidado animalista</p>
+          <p>© 2026 VetRecord Cloud · Cuidado animalista</p>
         </div>
       </div>
     </footer>

@@ -78,7 +78,7 @@ export default function Landing() {
         <p className="editorial-quote text-2xl text-dark md:text-3xl">
           "Una mascota no es un dato. Es un companero de vida, y su cuidado merece una experiencia serena."
         </p>
-        <p className="mt-4 text-xs uppercase tracking-[0.22em] text-dark/45">VetHelp · Manifiesto animalista</p>
+        <p className="mt-4 text-xs uppercase tracking-[0.22em] text-dark/45">VetRecord · Manifiesto animalista</p>
       </section>
     </div>
   )

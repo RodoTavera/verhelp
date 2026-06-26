@@ -80,7 +80,7 @@ export default function Header() {
             </div>
             <div className="leading-tight">
               <p className="eyebrow-label">Pet care cloud</p>
-              <p className="text-base font-semibold text-dark md:text-lg">VetHelp</p>
+              <p className="text-base font-semibold text-dark md:text-lg">VetRecord</p>
             </div>
           </Link>
 
